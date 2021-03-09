@@ -7,9 +7,10 @@ python3 manage.py makemigrations character_finder_api
 python3 manage.py migrate character_finder_api
 python3 manage.py loaddata users
 python3 manage.py loaddata tokens
+python3 manage.py loaddata genres
+python3 manage.py loaddata series
 python3 manage.py loaddata readers
 python3 manage.py loaddata authors
-python3 manage.py loaddata genres
 python3 manage.py loaddata media_types
 python3 manage.py loaddata fictions
 python3 manage.py loaddata characters

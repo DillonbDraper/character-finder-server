@@ -4,8 +4,7 @@
         "pk": 1,
         "fields": {
             "user": 1,
-            "name": "Dillon Draper",
-            "image":""
+            "name": "Dillon Draper"
         }
     },
     {
@@ -13,8 +12,7 @@
         "pk": 2,
         "fields": {
             "user": 2,
-            "name": "Steve Brownlee",
-            "image":""
+            "name": "Steve Brownlee"
         }
     }
 ]
