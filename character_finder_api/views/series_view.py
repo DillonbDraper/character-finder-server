@@ -4,7 +4,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Series
+from character_finder_api.models import Series, Genre
 from character_finder_api.views.genre import GenreSerializer
 
 
@@ -13,7 +13,9 @@ class SeriesView(ViewSet):
     def create(self, request):
         series = Series()
 
-        series.label = request.data['label']
+        series.title = request.data['title']
+        series.description = request.data['description']
+        series.genre = Genre.objects.get(pk = request.data['genreId'])
 
         try:
             series.save()
@@ -50,7 +52,8 @@ class SeriesView(ViewSet):
     def update(self, request, pk=None):
 
         series = Series.objects.get(pk=pk)
-        series.label = request.data['label']
+        series.title = request.data['title']
+        series.genre = Genre.objects.get(pk=request.data['genreId'])
 
         series.save()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
