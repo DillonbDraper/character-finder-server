@@ -1,0 +1,32 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$qMRH8szID7Z8$Vljya2V3XfruOHuvx1hGz9ZyKg4bxbw7rc2WO0gTR7I=",
+            "last_login": null,
+            "username": "dillonbdraper",
+            "first_name": "Dillon",
+            "last_name": "Draper",
+            "email": "dillonbdraper@gmail.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2011-09-01T13:20:30+03:00"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$xy1ADDwHRjrh$1udU9G8itv3N78hiH08Lx3Qkomr4vQ7M63PS04y+aJQ=",
+            "last_login": null,
+            "username": "user@user.com",
+            "first_name": "Elvis",
+            "last_name": "Pressley",
+            "email": "user@user.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2011-09-01T13:20:30+03:00"
+        }
+    }
+]

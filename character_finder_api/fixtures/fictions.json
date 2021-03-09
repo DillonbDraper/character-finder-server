@@ -1,0 +1,28 @@
+[
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 1,
+        "fields": {
+            "reader": 1,
+            "title": "The Fellowship of the Ring",
+            "image": "",
+            "date_published": "1954-07-29",
+            "description": "This is a placeholder description for a long book",
+            "media_type": 1,
+            "genre": 1
+        }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 2,
+        "fields": {
+            "reader": 1,
+            "title": "Absalom, Absalom!",
+            "image": "",
+            "date_published": "1936-01-01",
+            "description": "This is a placeholder description for a long book",
+            "media_type": 1,
+            "genre": 5
+        }
+    }
+]

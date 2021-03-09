@@ -1,0 +1,19 @@
+[
+    {
+        "model": "character_finder_api.CharacterFictionAssociation",
+        "pk": 1,
+        "fields": {
+            "character": 1,
+            "fiction": 1,
+            "series": 2
+        }
+    },
+    {
+        "model": "character_finder_api.CharacterFictionAssociation",
+        "pk": 2,
+        "fields": {
+            "character": 2,
+            "fiction": 2
+        }
+    }
+]

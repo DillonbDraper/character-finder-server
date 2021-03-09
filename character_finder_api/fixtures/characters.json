@@ -1,0 +1,44 @@
+[
+    {
+        "model": "character_finder_api.Character",
+        "pk": 1,
+        "fields": {
+            "reader": 1,
+            "name": "Gandalf",
+            "age": "6000 (roughly)",
+            "born_on": "unknown",
+            "died_on": "",
+            "alias": "The Grey, Mithreindeer, Greyheim, and countless others",
+            "bio": "Gandalf is 6000 years old I'm not writing his whole bio rn",
+            "public_version": true
+        }
+    },
+    {
+        "model": "character_finder_api.Character",
+        "pk": 2,
+        "fields": {
+            "reader": 1,
+            "name": "Thomas Sutpen",
+            "age": "50s (varies)",
+            "born_on": "1807",
+            "died_on": "1869",
+            "alias": "Colonel Sutpen",
+            "bio": "Wicked and tyrannical master of Sutpen's Hundred",
+            "public_version": true
+        }
+    },
+    {
+        "model": "character_finder_api.Character",
+        "pk": 3,
+        "fields": {
+            "reader": 1,
+            "name": "Frodo Baggins",
+            "age": "51",
+            "born_on": "Sept 22, 2968 Third Age",
+            "died_on": "",
+            "alias": "Ring Bearer",
+            "bio": "Look man you should know who Frodo is",
+            "public_version": true
+        }
+    },
+]

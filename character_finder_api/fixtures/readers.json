@@ -1,0 +1,20 @@
+[
+    {
+        "model": "character_finder_api.Reader",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "name": "Dillon Draper",
+            "image":""
+        }
+    },
+    {
+        "model": "character_finder_api.Reader",
+        "pk": 2,
+        "fields": {
+            "user": 2,
+            "name": "Steve Brownlee",
+            "image":""
+        }
+    }
+]

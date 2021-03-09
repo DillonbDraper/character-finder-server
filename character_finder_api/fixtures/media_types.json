@@ -1,0 +1,16 @@
+[
+    {
+        "model": "character_finder_api.MediaType",
+        "pk": 1,
+        "fields": {
+            "name": "Book"
+        }
+    },
+    {
+        "model": "character_finder_api.MediaType",
+        "pk": 2,
+        "fields": {
+            "name": "Film"
+        }
+    }
+]

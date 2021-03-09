@@ -1,0 +1,37 @@
+[
+    {
+        "model": "character_finder_api.Genre",
+        "pk": 1,
+        "fields": {
+            "name": "Fantasy"
+        }
+    },
+    {
+        "model": "character_finder_api.Genre",
+        "pk": 2,
+        "fields": {
+            "name": "Historical Fiction"
+        }
+    },
+    {
+        "model": "character_finder_api.Genre",
+        "pk": 3,
+        "fields": {
+            "name": "Science Fiction"
+        }
+    },
+    {
+        "model": "character_finder_api.Genre",
+        "pk": 4,
+        "fields": {
+            "name": "Romance"
+        }
+    },
+    {
+        "model": "character_finder_api.Genre",
+        "pk": 5,
+        "fields": {
+            "name": "Southern Gothic"
+        }
+    }
+]
