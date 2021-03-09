@@ -4,7 +4,7 @@ from .character_association import CharacterAssociation
 from .character_edit_queue import CharacterEditQueue
 from .characters import Character
 from .fiction_characters import CharacterFictionAssociation
-from .fiction import Fiction
+from .fictions import Fiction
 from .genres import Genre
 from .media_type import MediaType
 from .readers import Reader

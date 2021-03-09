@@ -8,4 +8,4 @@ class Fiction(models.Model):
     date_published = models.DateField()
     description = models.CharField(max_length=5000)
     media_type = models.ForeignKey("MediaType", on_delete=DO_NOTHING)
-    genre = models.ForeignKey('Genre', on_delete=DO_NOTHING)
+    genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
