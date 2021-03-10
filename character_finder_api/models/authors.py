@@ -7,4 +7,4 @@ class Author(models.Model):
     name = models.CharField(max_length=20)
     bio = models.CharField(max_length=1000)
     born_on = models.DateField()
-    died_on = models.DateField(blank=True)
+    died_on = models.DateField(blank=True, null=True)
