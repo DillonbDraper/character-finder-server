@@ -1,0 +1,20 @@
+[
+    {
+        "model": "character_finder_api.Series",
+        "pk": 1,
+        "fields": {
+            "title": "Dune",
+            "description": "A landmark first novel and weaker, less substantive entries make Dune an uneven series",
+            "genre": 3
+        }
+    },
+    {
+        "model": "character_finder_api.Series",
+        "pk": 2,
+        "fields": {
+            "title": "The Lord of The Rings",
+            "description": "Popularized epic fantasy and is still incredibly popular",
+            "genre": 1
+        }
+    }
+]

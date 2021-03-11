@@ -1,0 +1,24 @@
+[
+    {
+        "model": "character_finder_api.Author",
+        "pk": 1,
+        "fields": {
+            "reader": 1,
+            "name": "William Faulkner",
+            "bio": "Half mad poet laureate of the South",
+            "born_on": "1897-09-25",
+            "died_on": "1962-07-06"
+        }
+    },
+    {
+        "model": "character_finder_api.Author",
+        "pk": 2,
+        "fields": {
+            "reader": 1,
+            "name": "J.R.R. Tolkein",
+            "bio": "Godfather of fantasy",
+            "born_on": "1892-01-03",
+            "died_on": "1973-09-02"
+        }
+    }
+]

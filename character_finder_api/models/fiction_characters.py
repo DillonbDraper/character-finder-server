@@ -1,9 +1,7 @@
 from django.db import models
-from django.db.models.deletion import CASCADE
 
 
 class CharacterFictionAssociation(models.Model):
-    character = models.ForeignKey("character", models.CASCADE)
-    work = models.ForeignKey("fiction", on_delete=models.CASCADE)
-    series = models.ForeignKey('series', on_delete=models.CASCADE)
-    description = models.CharField(max_length=2000)
+    character = models.ForeignKey("Character", on_delete=models.CASCADE, related_name="fiction_char")
+    fiction = models.ForeignKey("Fiction", on_delete=models.CASCADE, related_name="char_fiction")
+    series = models.ForeignKey('Series', on_delete=models.CASCADE, blank=True, null=True, related_name="char_series")
