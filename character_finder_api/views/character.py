@@ -60,7 +60,6 @@ class Characters(ViewSet):
                 if character.associations.count() > 0:
                     serializer = SecondCharacterSerializer(character, context={'request': request})
 
-            # character.associations = CharacterAssociation.objects.filter(Q(char_one=character) | Q(char_two=character))
 
             return Response(serializer.data)
         except Exception as ex:
