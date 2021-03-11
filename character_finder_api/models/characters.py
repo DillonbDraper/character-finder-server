@@ -1,3 +1,4 @@
+from character_finder_api.models.character_association import CharacterAssociation
 from character_finder_api.models.series import Series
 from character_finder_api.models.fictions import Fiction
 from character_finder_api.models.authors import Author
@@ -29,8 +30,13 @@ class Character(models.Model):
             return works
 
     @property
-    def associated_characters(self):
-        associated = Character.objects.filter()
+    def associations(self):
+        return self.__associations
+
+    @associations.setter
+    def associations(self, value):
+        self.__associations = value
+
 
     @property
     def series(self):
