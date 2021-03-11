@@ -90,6 +90,7 @@ class Fictions(ViewSet):
             return Response({"message": "Only staff may delete works of fiction directly"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class FictionSerializer(serializers.ModelSerializer):
+    
 
     class Meta:
         model = Fiction

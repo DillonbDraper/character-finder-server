@@ -1,3 +1,6 @@
+from character_finder_api.views.series_view import SeriesSerializer
+from character_finder_api.views.fiction import FictionSerializer
+from character_finder_api.views.author import AuthorSerializer
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from django.http import HttpResponseServerError
@@ -120,7 +123,11 @@ class Characters(ViewSet):
 
 class CharacterSerializer(serializers.ModelSerializer):
 
+    works = FictionSerializer(many=True)
+    series = SeriesSerializer(many=True)
+    creators = AuthorSerializer(many=True)
+
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', )
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators')

@@ -75,8 +75,10 @@ class SeriesView(ViewSet):
 
 class SeriesSerializer(serializers.ModelSerializer):
 
+    genre = GenreSerializer(many=False)
+
+
     class Meta:
         model = Series
-        genre = GenreSerializer
         depth = 1
         fields = ('id', 'title', 'description', 'genre', )
