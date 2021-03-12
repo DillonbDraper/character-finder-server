@@ -63,7 +63,7 @@ class Characters(ViewSet):
             return HttpResponseServerError(ex)
 
     def list(self, request):
-        characters = Character.objects.all()
+        characters = Character.object.filter(public_version=True)
 
         name = self.request.query_params.get('name', None)
         fiction = self.request.query_params.get('fiction', None)
