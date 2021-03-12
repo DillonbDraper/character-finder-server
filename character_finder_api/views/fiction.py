@@ -46,6 +46,7 @@ class Fictions(ViewSet):
             fiction = Fiction.objects.get(pk=pk)
             fiction.characters = Character.objects.filter(fiction_char__fiction=fiction)
             fiction.creators = Author.objects.filter(fiction_author__fiction=fiction)
+            fiction.series = Series.objects.filter(char_series__fiction=fiction)
 
             serializer = ExtendedFictionSerializer(fiction, context={'request': request})
             return Response(serializer.data)
@@ -109,8 +110,9 @@ class ExtendedFictionSerializer(serializers.ModelSerializer):
 
     characters = BasicCharacterSerializer(many=True)
     creators = BasicAuthorSerializer(many=True)
+    series = BasicSeriesSerializer(many=True)
     
     class Meta:
         model = Fiction
         depth = 1
-        fields = ('id','reader', 'title', 'date_published', 'description', 'media_type', 'genre', 'creators', 'characters',)
+        fields = ('id','reader', 'title', 'date_published', 'description', 'media_type', 'genre', 'creators', 'characters', 'series')

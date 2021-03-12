@@ -29,4 +29,4 @@ class Series(models.Model):
 
     @creators.setter
     def creators(self, value):
-        self.creators = value
+        self.__creators = value

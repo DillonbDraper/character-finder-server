@@ -62,7 +62,7 @@ class Authors(ModelViewSet):
 
             author.characters = Character.objects.filter(fiction_char__fiction__author_fiction__author=author)
             author.works = Fiction.objects.filter(author_fiction__author=author)
-            author.series = Series.objects.filter(fiction_series__author=author)
+            author.series = Series.objects.filter(char_series__fiction__author_fiction__author=author)
             
             serializer = ExtendedAuthorSerializer(author, context={'request': request})
 

@@ -1,17 +1,12 @@
-from character_finder_api.models.authors import Author
 from character_finder_api.models.character_association import CharacterAssociation
-from character_finder_api.views.series_view import SeriesSerializer
-from character_finder_api.views.fiction import FictionSerializer
-from character_finder_api.views.author import AuthorSerializer
+from character_finder_api.serializers import BasicSeriesSerializer, BasicAuthorSerializer, BasicFictionSerializer
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from django.http import HttpResponseServerError
-from django.db.models import Q
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Character, Series, Reader, Author, Fiction
-from character_finder_api.views.genre import GenreSerializer
+from character_finder_api.models import Character,  Reader 
 
 
 class Characters(ViewSet):
@@ -156,9 +151,9 @@ class SecondAssociationSerializer(serializers.ModelSerializer):
 
 class FirstCharacterSerializer(serializers.ModelSerializer):
 
-    works = FictionSerializer(many=True)
-    series = SeriesSerializer(many=True)
-    creators = AuthorSerializer(many=True)
+    works = BasicFictionSerializer(many=True)
+    series = BasicSeriesSerializer(many=True)
+    creators = BasicAuthorSerializer(many=True)
     associations = FirstAssociationSerializer(many=True)
 
     class Meta:
@@ -168,9 +163,9 @@ class FirstCharacterSerializer(serializers.ModelSerializer):
 
 class SecondCharacterSerializer(serializers.ModelSerializer):
 
-    works = FictionSerializer(many=True)
-    series = SeriesSerializer(many=True)
-    creators = AuthorSerializer(many=True)
+    works = BasicFictionSerializer(many=True)
+    series = BasicSeriesSerializer(many=True)
+    creators = BasicAuthorSerializer(many=True)
     associations = SecondAssociationSerializer(many=True)
 
     class Meta:

@@ -7,7 +7,6 @@ class BasicCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        depth = 1
         fields = ( 'id', 'name', 'public_version',)
 
 class BasicSeriesSerializer(serializers.ModelSerializer):
@@ -20,12 +19,10 @@ class BasicAuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        depth = 1
         fields = ( 'id', 'name', )
 
 class BasicFictionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Fiction
-        depth = 1
         fields = ( 'id', 'title', )

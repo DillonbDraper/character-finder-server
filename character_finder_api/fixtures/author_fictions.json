@@ -4,8 +4,7 @@
         "pk": 1,
         "fields": {
             "author": 2,
-            "fiction": 1,
-            "series": 2
+            "fiction": 1
         }
     },
     {

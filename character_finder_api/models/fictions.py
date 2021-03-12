@@ -28,7 +28,7 @@ class Fiction(models.Model):
 
     @property
     def series(self):
-        return self.series
+        return self.__series
 
     @series.setter
     def series(self, value):
