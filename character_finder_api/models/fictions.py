@@ -9,3 +9,27 @@ class Fiction(models.Model):
     description = models.CharField(max_length=5000)
     media_type = models.ForeignKey("MediaType", on_delete=DO_NOTHING)
     genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
+
+    @property
+    def characters(self):
+        return self.__characters
+
+    @characters.setter
+    def characters(self, value):
+        self.__characters = value
+
+    @property
+    def creators(self):
+        return self.__creators
+
+    @creators.setter
+    def creators(self, value):
+        self.__creators = value
+
+    @property
+    def series(self):
+        return self.__series
+
+    @series.setter
+    def series(self, value):
+        self.__series = value

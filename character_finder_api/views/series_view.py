@@ -1,10 +1,12 @@
+from character_finder_api.views import character
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Series, Genre
+from character_finder_api.models import Series, Genre, Fiction, Author
+from character_finder_api.serializers import BasicCharacterSerializer, BasicAuthorSerializer, BasicFictionSerializer
 from character_finder_api.views.genre import GenreSerializer
 
 
@@ -31,13 +33,11 @@ class SeriesView(ViewSet):
             Response -- JSON serialized series instance
         """
         try:
-            # `pk` is a parameter to this function, and
-            # Django parses it from the URL route parameter
-            #   http://localhost:8000/categories/2
-            #
-            # The `2` at the end of the route becomes `pk`
-            post = Series.objects.get(pk=pk)
-            serializer = SeriesSerializer(post, context={'request': request})
+            
+            series = Series.objects.get(pk=pk)
+            series.works = Fiction.objects.filter(char_fiction__series=series)
+            series.creators = Author.objects.filter(fiction_author__fiction__char_fiction__series=series)
+            serializer = ExtendedSeriesSerializer(series, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
@@ -75,8 +75,24 @@ class SeriesView(ViewSet):
 
 class SeriesSerializer(serializers.ModelSerializer):
 
+    genre = GenreSerializer(many=False)
+
+
     class Meta:
         model = Series
-        genre = GenreSerializer
         depth = 1
         fields = ('id', 'title', 'description', 'genre', )
+
+
+class ExtendedSeriesSerializer(serializers.ModelSerializer):
+
+    genre = GenreSerializer(many=False)
+    creators = BasicAuthorSerializer(many=True)
+    # characters = BasicCharacterSerializer(many=True)
+    works = BasicFictionSerializer(many=True)
+
+
+    class Meta:
+        model = Series
+        depth = 1
+        fields = ('id', 'title', 'description', 'genre', 'works', 'creators')

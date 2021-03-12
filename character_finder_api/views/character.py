@@ -1,11 +1,12 @@
+from character_finder_api.models.character_association import CharacterAssociation
+from character_finder_api.serializers import BasicSeriesSerializer, BasicAuthorSerializer, BasicFictionSerializer
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Character, Genre, Reader
-from character_finder_api.views.genre import GenreSerializer
+from character_finder_api.models import Character,  Reader 
 
 
 class Characters(ViewSet):
@@ -28,7 +29,7 @@ class Characters(ViewSet):
 
         try:
             character.save()
-            serializer = CharacterSerializer(
+            serializer = GenericCharacterSerializer(
                 character, context={'request': request})
             return Response(serializer.data)
         except ValidationError as ex:
@@ -45,8 +46,18 @@ class Characters(ViewSet):
             #   http://localhost:8000/categories/2
             #
             # The `2` at the end of the route becomes `pk`
-            post = Character.objects.get(pk=pk)
-            serializer = CharacterSerializer(post, context={'request': request})
+            character = Character.objects.get(pk=pk)
+
+            character.associations = CharacterAssociation.objects.filter(char_one=character)
+            if character.associations.count() > 0:
+                serializer = FirstCharacterSerializer(character, context={'request': request})
+            else:
+                character.associations = CharacterAssociation.objects.filter(char_two=character)
+                if character.associations.count() > 0:
+                    serializer = SecondCharacterSerializer(character, context={'request': request})
+
+
+
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
@@ -77,7 +88,7 @@ class Characters(ViewSet):
 
 
 
-        serializer = CharacterSerializer(
+        serializer = GenericCharacterSerializer(
             characters, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -118,9 +129,54 @@ class Characters(ViewSet):
         else:
             return Response({"message": "Only staff may delete characters directly"}, status=status.HTTP_401_UNAUTHORIZED)
 
-class CharacterSerializer(serializers.ModelSerializer):
+class AssociatedCharacterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Character
+        fields = ('name', 'age', 'born_on', 'died_on', 'alias', 'bio',)
+
+class FirstAssociationSerializer(serializers.ModelSerializer):
+
+    char_two = AssociatedCharacterSerializer(many=False)
+    class Meta:
+        model = CharacterAssociation
+        fields = ('char_two', 'description',)
+
+class SecondAssociationSerializer(serializers.ModelSerializer):
+
+    char_one = AssociatedCharacterSerializer(many=False)
+    class Meta:
+        model = CharacterAssociation
+        fields = ('char_one', 'description',)
+
+class FirstCharacterSerializer(serializers.ModelSerializer):
+
+    works = BasicFictionSerializer(many=True)
+    series = BasicSeriesSerializer(many=True)
+    creators = BasicAuthorSerializer(many=True)
+    associations = FirstAssociationSerializer(many=True)
 
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', )
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations')
+
+class SecondCharacterSerializer(serializers.ModelSerializer):
+
+    works = BasicFictionSerializer(many=True)
+    series = BasicSeriesSerializer(many=True)
+    creators = BasicAuthorSerializer(many=True)
+    associations = SecondAssociationSerializer(many=True)
+
+    class Meta:
+        model = Character
+        depth = 1
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations')
+
+
+class GenericCharacterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Character
+        depth = 1
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version',)
