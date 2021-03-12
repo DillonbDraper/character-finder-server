@@ -32,3 +32,4 @@ class Author(models.Model):
     @series.setter
     def series(self, value):
         self.__series = value
+        

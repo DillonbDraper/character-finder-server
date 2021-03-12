@@ -1,3 +1,4 @@
+from character_finder_api.models.authors import Author
 from character_finder_api.models.character_association import CharacterAssociation
 from character_finder_api.views.series_view import SeriesSerializer
 from character_finder_api.views.fiction import FictionSerializer
@@ -9,7 +10,7 @@ from django.db.models import Q
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Character, Genre, Reader
+from character_finder_api.models import Character, Series, Reader, Author, Fiction
 from character_finder_api.views.genre import GenreSerializer
 
 
@@ -59,6 +60,7 @@ class Characters(ViewSet):
                 character.associations = CharacterAssociation.objects.filter(char_two=character)
                 if character.associations.count() > 0:
                     serializer = SecondCharacterSerializer(character, context={'request': request})
+
 
 
             return Response(serializer.data)

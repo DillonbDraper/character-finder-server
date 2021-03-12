@@ -1,3 +1,7 @@
+from character_finder_api.views import character
+from character_finder_api.models.authors import Author
+from character_finder_api.serializers.basic_serializers import BasicAuthorSerializer, BasicCharacterSerializer, BasicSeriesSerializer
+from character_finder_api.models.series import Series
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from django.http import HttpResponseServerError
@@ -40,7 +44,10 @@ class Fictions(ViewSet):
             #
             # The `2` at the end of the route becomes `pk`
             fiction = Fiction.objects.get(pk=pk)
-            serializer = FictionSerializer(fiction, context={'request': request})
+            fiction.characters = Character.objects.filter(fiction_char__fiction=fiction)
+            fiction.creators = Author.objects.filter(fiction_author__fiction=fiction)
+
+            serializer = ExtendedFictionSerializer(fiction, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
@@ -96,3 +103,14 @@ class FictionSerializer(serializers.ModelSerializer):
         model = Fiction
         depth = 1
         fields = ('id','reader', 'title', 'date_published', 'description', 'media_type', 'genre',)
+
+
+class ExtendedFictionSerializer(serializers.ModelSerializer):
+
+    characters = BasicCharacterSerializer(many=True)
+    creators = BasicAuthorSerializer(many=True)
+    
+    class Meta:
+        model = Fiction
+        depth = 1
+        fields = ('id','reader', 'title', 'date_published', 'description', 'media_type', 'genre', 'creators', 'characters',)
