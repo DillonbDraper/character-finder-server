@@ -88,7 +88,7 @@ class Characters(ViewSet):
 
 
 
-        serializer = GenericCharacterSerializer(
+        serializer = ListCharacterSerializer(
             characters, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -180,3 +180,11 @@ class GenericCharacterSerializer(serializers.ModelSerializer):
         model = Character
         depth = 1
         fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version',)
+        
+
+
+class ListCharacterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Character
+        fields = ('id', 'name', 'alias', 'public_version', 'works', 'series', 'creators')
