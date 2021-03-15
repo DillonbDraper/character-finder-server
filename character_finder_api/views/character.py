@@ -63,28 +63,24 @@ class Characters(ViewSet):
             return HttpResponseServerError(ex)
 
     def list(self, request):
-        characters = Character.object.filter(public_version=True)
+        characters = Character.objects.filter(public_version=True)
 
         name = self.request.query_params.get('name', None)
         fiction = self.request.query_params.get('fiction', None)
         author = self.request.query_params.get('author', None)
         series = self.request.query_params.get('series', None)
-        alias = self.request.query_params.get('alias', None)
 
         if name is not None:
-            characters = Character.objects.filter(name__icontains=name)
-        
-        if alias is not None:
-            characters = Character.objects.filter(alias__icontains=alias)
+            characters = characters.filter(name__icontains=name)
         
         if fiction is not None:
-            characters = Character.objects.filter(fiction_char__fiction=int(fiction))
+            characters = characters.filter(fiction_char__fiction=int(fiction))
 
         if series is not None:
-            characters = Character.objects.filter(fiction_char__series=int(series))
+            characters = characters.filter(fiction_char__series=int(series))
 
         if author is not None:
-            characters=Character.objects.filter(fiction_char__fiction__author_fiction__author__name__icontains=author)
+            characters = characters.filter(fiction_char__fiction__author_fiction__author__id=int(author))
 
 
 
@@ -95,7 +91,7 @@ class Characters(ViewSet):
     def update(self, request, pk=None):
 
         if request.auth.user.is_staff is True:
-                
+
             character = Character.objects.get(pk=pk)
             character.reader = Reader.objects.get(user=request.auth.user)
             character.born_on = request.data['born_on']
@@ -184,6 +180,10 @@ class GenericCharacterSerializer(serializers.ModelSerializer):
 
 
 class ListCharacterSerializer(serializers.ModelSerializer):
+
+    works = BasicFictionSerializer(many=True)
+    series = BasicSeriesSerializer(many=True)
+    creators = BasicAuthorSerializer(many=True)
 
     class Meta:
         model = Character
