@@ -101,11 +101,11 @@ class Fictions(ViewSet):
             return Response({"message": "Only staff may delete works of fiction directly"}, status=status.HTTP_401_UNAUTHORIZED)
 
     @action(methods=['post'], detail=True)
-    def create_relationsips(self, request, pk=None):
+    def create_relationships(self, request, pk=None):
 
         if request.method == "POST":
             fiction = Fiction.objects.get(pk=pk)
-            if request.data['author']:
+            if 'author' in request.data.keys():
                 author = Author.objects.get(pk=request.data['author']['id'])
                 try:
                     author_work = AuthorFictionAssociation.objects.get(
@@ -117,32 +117,36 @@ class Fictions(ViewSet):
                     author_work.author = author
                     author_work.save()
 
-                    if request.data['characters'] or request.data['series']:
+                    if 'characters' in request.data.keys() or 'series' in request.data.keys():
                         pass
                     else: return Response({}, status=status.HTTP_201_CREATED) 
 
 
-            if request.data['series'] and request.data['characters']:
+            if set(('series', 'characters')).issubset(request.data):
                 series = Series.objects.get(pk=request.data['series']['id'])
-                for character in request.data['characters']:
+                characters = request.data['characters']
+                for character in characters:
                     char = Character.objects.get(pk=character['id'])
                     try:
-                        char_fiction = CharacterFictionAssociation(
-                            character=char, fiction=fiction, series=series)
-
+                        char_fiction = CharacterFictionAssociation.objects.get(character=char, fiction=fiction, series=series)
+                        return Response({'request': "association already created"}, status=status.HTTP_406_NOT_ACCEPTABLE)
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
                         char_fiction.character = char
                         char_fiction.fiction = fiction
-                        char_fiction.series = series
-                        char_fiction.save()
+                        try: 
+                            series_checker = CharacterFictionAssociation.objects.get(fiction=fiction, series=series)
+                            char_fiction.save
+                        except CharacterFictionAssociation.DoesNotExist: 
+                            char_fiction.series = series
+                            char_fiction.save()
 
-                        return Response({}, status=status.HTTP_201_CREATED)
+                return Response({}, status=status.HTTP_201_CREATED)
 
-            elif request.data['series']:
+            elif 'series' in request.data.keys():
                 series = Series.objects.get(pk=request.data['series']['id'])
                 try:
-                    char_fiction = CharacterFictionAssociation(
+                    char_fiction = CharacterFictionAssociation.objects.get(
                         series=series, fiction=fiction)
                 except CharacterFictionAssociation.DoesNotExist:
                     char_fiction = CharacterFictionAssociation()
@@ -152,12 +156,11 @@ class Fictions(ViewSet):
 
                     return Response({}, status=status.HTTP_201_CREATED)
 
-            elif request.data['characters']:
+            elif 'characters' in request.data.keys():
                 for character in request.data['characters']:
                     char = Character.objects.get(pk=character['id'])
                     try:
-                        char_fiction = CharacterFictionAssociation(
-                            character=char, fiction=fiction)
+                        char_fiction = CharacterFictionAssociation.objects.get(character=char, fiction=fiction)
 
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
@@ -165,7 +168,7 @@ class Fictions(ViewSet):
                         char_fiction.fiction = fiction
                         char_fiction.save()
 
-                        return Response({}, status=status.HTTP_201_CREATED)
+                return Response({}, status=status.HTTP_201_CREATED)
 
 
 class FictionSerializer(serializers.ModelSerializer):
