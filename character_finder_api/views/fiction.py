@@ -1,3 +1,4 @@
+from character_finder_api.models.author_fiction import AuthorFictionAssociation
 from character_finder_api.views import character
 from character_finder_api.models.authors import Author
 from character_finder_api.serializers.basic_serializers import BasicAuthorSerializer, BasicCharacterSerializer, BasicSeriesSerializer
@@ -8,6 +9,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
+from rest_framework.decorators import action
 from character_finder_api.models import Character, Genre, Reader, Fiction
 from character_finder_api.views.genre import GenreSerializer
 
@@ -94,6 +96,27 @@ class Fictions(ViewSet):
         
         else:
             return Response({"message": "Only staff may delete works of fiction directly"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+    @action(methods=['post'], detail=True)
+    def author_relate(self, request, pk=None):
+
+        if request.method == "POST":
+            author = Author.objects.get(pk=request.data['author']['id'])
+            fiction = Fiction.objects.get(pk=pk)
+            try:
+                author_work = AuthorFictionAssociation.objects.get(author=author, fiction=fiction)
+                return Response(
+                    {'message': 'Series/Fiction relationship already exists'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+            except AuthorFictionAssociation.DoesNotExist: 
+                author_work = AuthorFictionAssociation()
+                author_work.fiction = fiction
+                author_work.author = author
+                author_work.save()
+
+                return Response({}, status=status.HTTP_201_CREATED)
 
 class FictionSerializer(serializers.ModelSerializer):
     
