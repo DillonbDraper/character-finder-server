@@ -56,7 +56,7 @@ class Characters(ViewSet):
                 if character.associations.count() > 0:
                     serializer = SecondCharacterSerializer(character, context={'request': request})
 
-            if character.associations.count() is 0:
+            if character.associations.count() == 0:
                 serializer = FirstCharacterSerializer(character, context={'request': request})
 
 

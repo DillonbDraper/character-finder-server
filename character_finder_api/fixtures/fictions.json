@@ -7,7 +7,6 @@
             "title": "The Fellowship of the Ring",
             "date_published": "1954-07-29",
             "description": "This is a placeholder description for a long book",
-            "media_type": 1,
             "genre": 1
         }
     },
@@ -19,7 +18,6 @@
             "title": "Absalom, Absalom!",
             "date_published": "1936-01-01",
             "description": "This is a placeholder description for a long book",
-            "media_type": 1,
             "genre": 5
         }
     }

@@ -11,7 +11,6 @@ python3 manage.py loaddata genres
 python3 manage.py loaddata series
 python3 manage.py loaddata readers
 python3 manage.py loaddata authors
-python3 manage.py loaddata media_types
 python3 manage.py loaddata fictions
 python3 manage.py loaddata characters
 python3 manage.py loaddata character_associations
