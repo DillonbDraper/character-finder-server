@@ -17,7 +17,7 @@ class SeriesView(ViewSet):
 
         series.title = request.data['title']
         series.description = request.data['description']
-        series.genre = Genre.objects.get(pk = request.data['genreId'])
+        series.genre = Genre.objects.get(pk = request.data['genre']['id'])
 
         try:
             series.save()
