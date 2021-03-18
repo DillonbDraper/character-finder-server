@@ -50,7 +50,7 @@ class Fictions(ViewSet):
             fiction.creators = Author.objects.filter(
                 fiction_author__fiction=fiction)
             fiction.series = Series.objects.filter(
-                char_series__fiction=fiction)
+                char_series__fiction=fiction).distinct()
 
             serializer = ExtendedFictionSerializer(
                 fiction, context={'request': request})
@@ -105,21 +105,23 @@ class Fictions(ViewSet):
 
         if request.method == "POST":
             fiction = Fiction.objects.get(pk=pk)
-            if 'author' in request.data.keys():
-                author = Author.objects.get(pk=request.data['author']['id'])
-                try:
-                    author_work = AuthorFictionAssociation.objects.get(
-                        author=author, fiction=fiction)
+            if 'authors' in request.data.keys():
+                authors = request.data['authors']
+                for author in authors:
+                    author = Author.objects.get(pk=author['id'])
+                    try:
+                        author_work = AuthorFictionAssociation.objects.get(
+                            author=author, fiction=fiction)
 
-                except AuthorFictionAssociation.DoesNotExist:
-                    author_work = AuthorFictionAssociation()
-                    author_work.fiction = fiction
-                    author_work.author = author
-                    author_work.save()
+                    except AuthorFictionAssociation.DoesNotExist:
+                        author_work = AuthorFictionAssociation()
+                        author_work.fiction = fiction
+                        author_work.author = author
+                        author_work.save()
 
-                    if 'characters' in request.data.keys() or 'series' in request.data.keys():
-                        pass
-                    else: return Response({}, status=status.HTTP_201_CREATED) 
+                if 'characters' in request.data.keys() or 'series' in request.data.keys():
+                            pass
+                else: return Response({}, status=status.HTTP_201_CREATED) 
 
 
             if set(('series', 'characters')).issubset(request.data):
@@ -134,12 +136,8 @@ class Fictions(ViewSet):
                         char_fiction = CharacterFictionAssociation()
                         char_fiction.character = char
                         char_fiction.fiction = fiction
-                        try: 
-                            series_checker = CharacterFictionAssociation.objects.get(fiction=fiction, series=series)
-                            char_fiction.save
-                        except CharacterFictionAssociation.DoesNotExist: 
-                            char_fiction.series = series
-                            char_fiction.save()
+                        char_fiction.series = series
+                        char_fiction.save()
 
                 return Response({}, status=status.HTTP_201_CREATED)
 
