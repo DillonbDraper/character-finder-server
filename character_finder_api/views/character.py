@@ -6,7 +6,9 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Character,  Reader 
+from character_finder_api.models import Character, Reader, CharacterFictionAssociation, Author, AuthorFictionAssociation, Series, CharacterEditQueue 
+from rest_framework.decorators import action
+
 
 
 class Characters(ViewSet):
@@ -22,10 +24,10 @@ class Characters(ViewSet):
         character.age = request.data['age']
         character.bio = request.data['bio']
         
-        if request.auth.user.is_staff is True:
-            character.public_version = True
-        else:
+        if request.data['edit'] is True:
             character.public_version = False
+        else:
+            character.public_version = True
 
         try:
             character.save()
@@ -127,6 +129,168 @@ class Characters(ViewSet):
         
         else:
             return Response({"message": "Only staff may delete characters directly"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    
+    @action(methods=['post'], detail=True)
+    def create_relationships(self, request, pk=None):
+
+        if request.method == "POST":
+            character = Character.objects.get(pk=pk)
+            authors = request.data['authors']
+            fictions = request.data['fictions']
+
+
+            if 'series' in request.data.keys():
+                for author in authors:
+                    author = Author.objects.get(pk=author['id'])
+                    try:
+                        author_work = AuthorFictionAssociation.objects.get(
+                            author=author, fiction=fiction)
+
+                    except AuthorFictionAssociation.DoesNotExist:
+                        author_work = AuthorFictionAssociation()
+                        author_work.fiction = fiction
+                        author_work.author = author
+                        author_work.save()
+
+                if 'characters' in request.data.keys() or 'series' in request.data.keys():
+                            pass
+                else: return Response({}, status=status.HTTP_201_CREATED) 
+
+
+            if set(('series', 'characters')).issubset(request.data):
+                series = Series.objects.get(pk=request.data['series']['id'])
+                characters = request.data['characters']
+                for character in characters:
+                    char = Character.objects.get(pk=character['id'])
+                    try:
+                        char_fiction = CharacterFictionAssociation.objects.get(character=char, fiction=fiction, series=series)
+                        return Response({'request': "association already created"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                    except CharacterFictionAssociation.DoesNotExist:
+                        char_fiction = CharacterFictionAssociation()
+                        char_fiction.character = char
+                        char_fiction.fiction = fiction
+                        char_fiction.series = series
+                        char_fiction.save()
+
+                return Response({}, status=status.HTTP_201_CREATED)
+
+            elif 'series' in request.data.keys():
+                series = Series.objects.get(pk=request.data['series']['id'])
+                try:
+                    char_fiction = CharacterFictionAssociation.objects.get(
+                        series=series, fiction=fiction)
+                except CharacterFictionAssociation.DoesNotExist:
+                    char_fiction = CharacterFictionAssociation()
+                    char_fiction.fiction = fiction
+                    char_fiction.series = series
+                    char_fiction.save()
+
+                    return Response({}, status=status.HTTP_201_CREATED)
+
+            elif 'characters' in request.data.keys():
+                for character in request.data['characters']:
+                    char = Character.objects.get(pk=character['id'])
+                    try:
+                        char_fiction = CharacterFictionAssociation.objects.get(character=char, fiction=fiction)
+
+                    except CharacterFictionAssociation.DoesNotExist:
+                        char_fiction = CharacterFictionAssociation()
+                        char_fiction.character = char
+                        char_fiction.fiction = fiction
+                        char_fiction.save()
+
+                return Response({}, status=status.HTTP_201_CREATED)
+
+    @action(methods=['post'], detail=True)
+    def edit_request(self, request, pk=None):
+
+        if request.method == 'POST':
+            base_character = Character.objects.get(pk=pk)
+            new_character = Character.objects.get(pk = request.data['id'])
+            reader = Reader.objects.get(user = request.auth.user)
+
+            try:
+                check_queue = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
+                return Response({"request": "You already have an entry in the edit queue for this character"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+            except CharacterEditQueue.DoesNotExist:
+
+                queue_entry = CharacterEditQueue()
+                queue_entry.base_character = base_character
+                queue_entry.new_character = new_character
+                if queue_entry.approved is not None:
+                    queue_entry.approved = None
+
+                queue_entry.save()
+
+                return Response({}, status=status.HTTP_201_CREATED)
+
+    @action(methods=['get'], detail=True)
+    def check_for_match(self, request, pk=None):
+
+        if request.method == 'GET':
+            reader = Reader.objects.get(user = request.auth.user)
+            base_character = Character.objects.get(pk=pk)
+
+            try :
+                edit_queue_entry = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
+                personal_version = edit_queue_entry.new_character
+                serializer = FirstCharacterSerializer(personal_version, context={'request': request})
+
+                return Response(serializer.data)
+            
+
+
+            except CharacterEditQueue.DoesNotExist:
+                return Response({"response": "No match currently in edit queue"}, status=status.HTTP_204_NO_CONTENT)
+            except Exception as ex:
+                return HttpResponseServerError(ex)
+
+    @action(methods=['put', 'delete'], detail=True)
+    def decide_edit(self, request, pk=None):
+        reader = Reader.objects.get(user = request.auth.user)
+        base_character = Character.objects.get(pk=pk)
+        new_character = Character.objects.get(pk = request.data['id'])
+
+        if reader.user.is_staff is False:
+            return Response({"warning": "Only admins may perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+        if request.method == 'PUT':
+
+            try:
+                queue_entry = CharacterEditQueue.objects.get(base_character=base_character, new_character=new_character)
+                base_character.name = new_character.name
+                base_character.alias = new_character.alias
+                base_character.born_on = new_character.born_on
+                base_character.died_on = new_character.died_on
+                base_character.bio = new_character.bio
+
+                base_character.save()
+                new_character.delete()
+
+                return Response({"Message": "Edit successful"}, status=status.HTTP_200_OK)
+            except Exception as ex:
+                return HttpResponseServerError(ex)
+
+
+
+
+
+
+        elif request.method == 'DELETE':
+            try:
+                queue = CharacterEditQueue.objects.get(base_character=base_character, new_character=new_character, reader=reader)
+                queue.approved = False
+                queue.save()
+
+                return Response({"Message": "Edit removed from consideration"}, status=status.HTTP_200_OK)
+
+            except Exception as ex:
+                return HttpResponseServerError(ex)
+            
+
+    
+
 
 class AssociatedCharacterSerializer(serializers.ModelSerializer):
 
