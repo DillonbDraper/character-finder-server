@@ -227,7 +227,7 @@ class Characters(ViewSet):
             except CharacterEditQueue.DoesNotExist:
 
                 new_character.save()
-                
+
                 queue_entry = CharacterEditQueue()
                 queue_entry.base_character = base_character
                 queue_entry.reader = reader
@@ -300,6 +300,12 @@ class Characters(ViewSet):
 
             except Exception as ex:
                 return HttpResponseServerError(ex)
+
+    @action(methods=['get'], detail=False)
+    def unapproved(self, request):
+        unapproved_characters = Character.objects.filter(public_version = False)
+        serializer = GenericCharacterSerializer(unapproved_characters, many=True, context={'request': request})
+        return Response(serializer.data)
             
 
     
@@ -355,7 +361,7 @@ class GenericCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version',)
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', 'works', 'series', 'creators')
         
 
 

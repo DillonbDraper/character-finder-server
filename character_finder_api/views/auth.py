@@ -21,7 +21,8 @@ def login_user(request):
         # If authentication was successful, respond with their token
         if authenticated_user is not None:
             token = Token.objects.get(user=authenticated_user)
-            data = json.dumps({"valid": True, "token": token.key})
+            staff = authenticated_user.is_staff
+            data = json.dumps({"valid": True, "token": token.key, "staff" : staff})
             return HttpResponse(data, content_type='application/json')
         else:
             # Bad login details were provided. So we can't log the user in.
