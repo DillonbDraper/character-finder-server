@@ -244,12 +244,22 @@ class Characters(ViewSet):
 
         if request.method == 'GET':
             reader = Reader.objects.get(user = request.auth.user)
-            base_character = Character.objects.get(pk=pk)
+            new_character = Character.objects.get(pk=pk)
 
             try :
-                edit_queue_entry = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
-                personal_version = edit_queue_entry.new_character
-                serializer = FirstCharacterSerializer(personal_version, context={'request': request})
+                edit_queue_entry = CharacterEditQueue.objects.get(new_character=new_character, reader=reader)
+                base_version = edit_queue_entry.base_character    
+
+                base_version.associations = CharacterAssociation.objects.filter(char_one=base_version)
+                if base_version.associations.count() > 0:
+                    serializer = FirstCharacterSerializer(base_version, context={'request': request})
+                else:
+                    base_version.associations = CharacterAssociation.objects.filter(char_two=base_version)
+                    if base_version.associations.count() > 0:
+                        serializer = SecondCharacterSerializer(base_version, context={'request': request})
+
+                if base_version.associations.count() == 0:
+                    serializer = FirstCharacterSerializer(base_version, context={'request': request})    
 
                 return Response(serializer.data)
             
@@ -304,6 +314,25 @@ class Characters(ViewSet):
     @action(methods=['get'], detail=False)
     def unapproved(self, request):
         unapproved_characters = Character.objects.filter(public_version = False)
+
+        
+        name = self.request.query_params.get('name', None)
+        fiction = self.request.query_params.get('fiction', None)
+        author = self.request.query_params.get('author', None)
+        series = self.request.query_params.get('series', None)
+
+        if name is not None:
+            unapproved_characters = unapproved_characters.filter(name__icontains=name)
+        
+        if fiction is not None:
+            unapproved_characters = unapproved_characters.filter(fiction_char__fiction=int(fiction))
+
+        if series is not None:
+            unapproved_characters = unapproved_characters.filter(fiction_char__series=int(series))
+
+        if author is not None:
+            unapproved_characters = unapproved_characters.filter(fiction_char__fiction__author_fiction__author__id=int(author))
+
         serializer = GenericCharacterSerializer(unapproved_characters, many=True, context={'request': request})
         return Response(serializer.data)
             
