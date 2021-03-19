@@ -313,7 +313,7 @@ class Characters(ViewSet):
 
     @action(methods=['get'], detail=False)
     def unapproved(self, request):
-        unapproved_characters = Character.objects.filter(public_version = False)
+        unapproved_characters = Character.objects.filter(public_version = False).exclude(new_char__approved=False)
 
         
         name = self.request.query_params.get('name', None)
