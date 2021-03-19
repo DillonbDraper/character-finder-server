@@ -207,8 +207,18 @@ class Characters(ViewSet):
 
         if request.method == 'POST':
             base_character = Character.objects.get(pk=pk)
-            new_character = Character.objects.get(pk = request.data['id'])
             reader = Reader.objects.get(user = request.auth.user)
+            
+            new_character = Character()
+
+            new_character.reader = Reader.objects.get(user=request.auth.user)
+            new_character.name = request.data['name']
+            new_character.born_on = request.data['born_on']
+            new_character.died_on = request.data['died_on']
+            new_character.alias = request.data['alias']
+            new_character.age = request.data['age']
+            new_character.bio = request.data['bio']
+            new_character.public_version = False
 
             try:
                 check_queue = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
@@ -216,8 +226,11 @@ class Characters(ViewSet):
 
             except CharacterEditQueue.DoesNotExist:
 
+                new_character.save()
+                
                 queue_entry = CharacterEditQueue()
                 queue_entry.base_character = base_character
+                queue_entry.reader = reader
                 queue_entry.new_character = new_character
                 if queue_entry.approved is not None:
                     queue_entry.approved = None
