@@ -248,7 +248,7 @@ class Characters(ViewSet):
 
             try :
                 edit_queue_entry = CharacterEditQueue.objects.get(new_character=new_character, reader=reader)
-                base_version = edit_queue_entry.base_character    
+                base_version = edit_queue_entry.base_character
 
                 base_version.associations = CharacterAssociation.objects.filter(char_one=base_version)
                 if base_version.associations.count() > 0:
@@ -269,6 +269,38 @@ class Characters(ViewSet):
                 return Response({"response": "No match currently in edit queue"}, status=status.HTTP_204_NO_CONTENT)
             except Exception as ex:
                 return HttpResponseServerError(ex)
+
+    @action(methods=['get'], detail=True)
+    def check_for_match_original(self, request, pk=None):
+
+        if request.method == 'GET':
+            reader = Reader.objects.get(user = request.auth.user)
+            base_character = Character.objects.get(pk=pk)
+
+            try :
+                edit_queue_entry = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
+                new_character = edit_queue_entry.new_character
+
+                new_character.associations = CharacterAssociation.objects.filter(char_one=new_character)
+                if new_character.associations.count() > 0:
+                    serializer = FirstCharacterSerializer(new_character, context={'request': request})
+                else:
+                    new_character.associations = CharacterAssociation.objects.filter(char_two=new_character)
+                    if new_character.associations.count() > 0:
+                        serializer = SecondCharacterSerializer(new_character, context={'request': request})
+
+                if new_character.associations.count() == 0:
+                    serializer = FirstCharacterSerializer(new_character, context={'request': request})    
+
+                return Response(serializer.data)
+            
+
+
+            except CharacterEditQueue.DoesNotExist:
+                return Response({}, status=status.HTTP_204_NO_CONTENT)
+            except Exception as ex:
+                return HttpResponseServerError(ex)
+
 
     @action(methods=['put', 'delete'], detail=True)
     def decide_edit(self, request, pk=None):
