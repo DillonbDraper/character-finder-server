@@ -95,15 +95,16 @@ class Characters(ViewSet):
 
     def update(self, request, pk=None):
 
-        if request.auth.user.is_staff is True:
+        character = Character.objects.get(pk=pk)
+        reader = Reader.objects.get(user=request.auth.user)
+        if request.auth.user.is_staff or character.reader == reader is True:
 
-            character = Character.objects.get(pk=pk)
-            character.reader = Reader.objects.get(user=request.auth.user)
             character.born_on = request.data['born_on']
             character.died_on = request.data['died_on']
             character.alias = request.data['alias']
             character.age = request.data['age']
             character.bio = request.data['bio']
+            character.reader = Reader.objects.get(pk = request.data['reader_id'])
 
             character.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
