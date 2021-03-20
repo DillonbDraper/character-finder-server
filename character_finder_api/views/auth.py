@@ -55,7 +55,10 @@ def register_user(request):
     new_user.save()
     # Use the REST Framework's token generator on the new user account
     token = Token.objects.create(user=new_user)
+    staff = True
+
     reader.save()
     # Return the token to the client
-    data = json.dumps({"token": token.key})
+    data = json.dumps({"valid": True, "token": token.key, "staff" : staff})
+
     return HttpResponse(data, content_type='application/json')

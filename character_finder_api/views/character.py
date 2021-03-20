@@ -368,9 +368,18 @@ class Characters(ViewSet):
 
         serializer = GenericCharacterSerializer(unapproved_characters, many=True, context={'request': request})
         return Response(serializer.data)
-            
 
-    
+    @action(methods=['delete'], detail=True)
+    def destroy_all_personal_versions(self, request, pk=None):
+        if request.auth.user.is_staff:
+            personal_versions = Character.objects.filter(new_char__base_character__id=pk)
+            for character in personal_versions:
+                character.delete()
+
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"Warning": "Only admins may access this function"}, status=status.HTTP_403_FORBIDDEN)
+
 
 
 class AssociatedCharacterSerializer(serializers.ModelSerializer):
