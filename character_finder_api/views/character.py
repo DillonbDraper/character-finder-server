@@ -6,7 +6,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Character, Reader, CharacterFictionAssociation, Author, AuthorFictionAssociation, Series, CharacterEditQueue 
+from character_finder_api.models import Character, Reader, CharacterFictionAssociation, Author, AuthorFictionAssociation, Series, CharacterEditQueue
 from rest_framework.decorators import action
 
 
