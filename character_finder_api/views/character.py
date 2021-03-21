@@ -99,6 +99,12 @@ class Characters(ViewSet):
         reader = Reader.objects.get(user=request.auth.user)
         if request.auth.user.is_staff or character.reader == reader is True:
 
+            if request.data['reset_queue']:
+
+                queue_entry = CharacterEditQueue.objects.get(new_character=character)
+                queue_entry.approved = None
+                queue_entry.save()
+
             character.born_on = request.data['born_on']
             character.died_on = request.data['died_on']
             character.alias = request.data['alias']
