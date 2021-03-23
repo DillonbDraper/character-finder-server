@@ -4,6 +4,7 @@
         "pk": 1,
         "fields": {
             "reader": 1,
+            "image": "/gandalf.jpg",
             "name": "Gandalf",
             "age": "6000 (roughly)",
             "born_on": "unknown",

@@ -1,6 +1,8 @@
 from character_finder_api.views.author import Authors
 from django.urls import path
 from django.conf.urls import include
+from django.conf.urls.static import static
+from django.conf import settings
 from rest_framework import routers
 from character_finder_api.views import Genres, SeriesView, Characters, Fictions
 from character_finder_api.views import register_user, login_user
@@ -19,3 +21,4 @@ urlpatterns = [
     path('login', login_user),
     path('api-auth', include('rest_framework.urls', namespace='rest_framework')),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

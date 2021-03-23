@@ -23,6 +23,7 @@ class Characters(ViewSet):
         character.alias = request.data['alias']
         character.age = request.data['age']
         character.bio = request.data['bio']
+        character.image = request.data['image']
         
         if request.data['edit'] is True:
             character.public_version = False
@@ -418,7 +419,7 @@ class FirstCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations')
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations', 'image')
 
 class SecondCharacterSerializer(serializers.ModelSerializer):
 
@@ -430,7 +431,7 @@ class SecondCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations')
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations', 'image')
 
 
 class GenericCharacterSerializer(serializers.ModelSerializer):
@@ -438,7 +439,7 @@ class GenericCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', 'works', 'series', 'creators')
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', 'works', 'series', 'creators', 'image')
         
 
 

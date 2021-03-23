@@ -8,6 +8,7 @@ from django.db.models.deletion import DO_NOTHING
 
 class Character(models.Model):
     reader = models.ForeignKey("reader", on_delete=DO_NOTHING)
+    image = models.ImageField(null=True, blank=True, upload_to='images')
     age = models.CharField(max_length=20)
     born_on = models.CharField(max_length=50)
     died_on = models.CharField(max_length=50, blank=True, null=True)
