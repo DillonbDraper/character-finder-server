@@ -18,12 +18,12 @@ class Character(models.Model):
 
     @property
     def creators(self):
-        creators = Author.objects.filter(fiction_author__fiction__char_fiction__character=self)
+        creators = Author.objects.filter(fiction_author__fiction__char_fiction__character=self).distinct()
         return creators
     
     @property
     def works(self):
-        works = Fiction.objects.filter(char_fiction__character=self)
+        works = Fiction.objects.filter(char_fiction__character=self).distinct()
         if len(works) == 0:
             return ""
         else: 
@@ -40,10 +40,9 @@ class Character(models.Model):
 
     @property
     def series(self):
-        series = Series.objects.filter(char_series__character=self)
+        series = Series.objects.filter(char_series__character=self).distinct()
         if len(series) == 0:
             return ""
         else:
             return series
-
     

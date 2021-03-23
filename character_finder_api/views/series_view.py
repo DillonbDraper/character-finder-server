@@ -5,7 +5,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Series, Genre, Fiction, Author
+from character_finder_api.models import Series, Genre, Fiction, Author, Character
 from character_finder_api.serializers import BasicCharacterSerializer, BasicAuthorSerializer, BasicFictionSerializer
 from character_finder_api.views.genre import GenreSerializer
 
@@ -37,6 +37,8 @@ class SeriesView(ViewSet):
             series = Series.objects.get(pk=pk)
             series.works = Fiction.objects.filter(char_fiction__series=series).distinct()
             series.creators = Author.objects.filter(fiction_author__fiction__char_fiction__series=series).distinct()
+            series.characters = Character.objects.filter(fiction_char__series=series).distinct()
+
             serializer = ExtendedSeriesSerializer(series, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
@@ -90,9 +92,10 @@ class ExtendedSeriesSerializer(serializers.ModelSerializer):
     creators = BasicAuthorSerializer(many=True)
     # characters = BasicCharacterSerializer(many=True)
     works = BasicFictionSerializer(many=True)
+    characters = BasicCharacterSerializer(many=True)
 
 
     class Meta:
         model = Series
         depth = 1
-        fields = ('id', 'title', 'description', 'genre', 'works', 'creators')
+        fields = ('id', 'title', 'description', 'genre', 'works', 'creators', 'characters')

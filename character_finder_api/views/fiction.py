@@ -45,12 +45,9 @@ class Fictions(ViewSet):
             #
             # The `2` at the end of the route becomes `pk`
             fiction = Fiction.objects.get(pk=pk)
-            fiction.characters = Character.objects.filter(
-                fiction_char__fiction=fiction)
-            fiction.creators = Author.objects.filter(
-                fiction_author__fiction=fiction)
-            fiction.series = Series.objects.filter(
-                char_series__fiction=fiction).distinct()
+            fiction.characters = Character.objects.filter(fiction_char__fiction=fiction)
+            fiction.creators = Author.objects.filter(fiction_author__fiction=fiction)
+            fiction.series = Series.objects.filter(char_series__fiction=fiction).distinct()
 
             serializer = ExtendedFictionSerializer(
                 fiction, context={'request': request})
