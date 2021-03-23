@@ -15,5 +15,14 @@
             "character": 2,
             "fiction": 2
         }
+    },
+    {
+        "model": "character_finder_api.CharacterFictionAssociation",
+        "pk": 3,
+        "fields": {
+            "character": 3,
+            "fiction": 1,
+            "series": 2
+        }
     }
 ]
