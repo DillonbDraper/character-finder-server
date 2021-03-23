@@ -20,5 +20,16 @@
             "description": "This is a placeholder description for a long book",
             "genre": 5
         }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 3,
+        "fields": {
+            "reader": 1,
+            "title": "The Two Towers",
+            "date_published": "1954-11-11",
+            "description": "Sequel to fellowship",
+            "genre": 1
+        }
     }
 ]

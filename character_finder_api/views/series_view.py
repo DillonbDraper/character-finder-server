@@ -35,8 +35,8 @@ class SeriesView(ViewSet):
         try:
             
             series = Series.objects.get(pk=pk)
-            series.works = Fiction.objects.filter(char_fiction__series=series)
-            series.creators = Author.objects.filter(fiction_author__fiction__char_fiction__series=series)
+            series.works = Fiction.objects.filter(char_fiction__series=series).distinct()
+            series.creators = Author.objects.filter(fiction_author__fiction__char_fiction__series=series).distinct()
             serializer = ExtendedSeriesSerializer(series, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
