@@ -10,7 +10,6 @@ from character_finder_api.models import Character, Reader, CharacterFictionAssoc
 from rest_framework.decorators import action
 
 
-
 class Characters(ViewSet):
 
     def create(self, request):
@@ -25,8 +24,6 @@ class Characters(ViewSet):
         character.age = request.POST.get('age')
         character.bio = request.POST.get('bio')
 
-
-        
         if request.POST.get('edit') == True:
             character.public_version = False
         else:
@@ -53,18 +50,21 @@ class Characters(ViewSet):
             # The `2` at the end of the route becomes `pk`
             character = Character.objects.get(pk=pk)
 
-            character.associations = CharacterAssociation.objects.filter(char_one=character)
+            character.associations = CharacterAssociation.objects.filter(
+                char_one=character)
             if character.associations.count() > 0:
-                serializer = FirstCharacterSerializer(character, context={'request': request})
+                serializer = FirstCharacterSerializer(
+                    character, context={'request': request})
             else:
-                character.associations = CharacterAssociation.objects.filter(char_two=character)
+                character.associations = CharacterAssociation.objects.filter(
+                    char_two=character)
                 if character.associations.count() > 0:
-                    serializer = SecondCharacterSerializer(character, context={'request': request})
+                    serializer = SecondCharacterSerializer(
+                        character, context={'request': request})
 
             if character.associations.count() == 0:
-                serializer = FirstCharacterSerializer(character, context={'request': request})
-
-
+                serializer = FirstCharacterSerializer(
+                    character, context={'request': request})
 
             return Response(serializer.data)
         except Exception as ex:
@@ -80,7 +80,7 @@ class Characters(ViewSet):
 
         if name is not None:
             characters = characters.filter(name__icontains=name)
-        
+
         if fiction is not None:
             characters = characters.filter(fiction_char__fiction=int(fiction))
 
@@ -88,9 +88,8 @@ class Characters(ViewSet):
             characters = characters.filter(fiction_char__series=int(series))
 
         if author is not None:
-            characters = characters.filter(fiction_char__fiction__author_fiction__author__id=int(author))
-
-
+            characters = characters.filter(
+                fiction_char__fiction__author_fiction__author__id=int(author))
 
         serializer = ListCharacterSerializer(
             characters, many=True, context={'request': request})
@@ -104,7 +103,8 @@ class Characters(ViewSet):
 
             if request.data['reset_queue']:
 
-                queue_entry = CharacterEditQueue.objects.get(new_character=character)
+                queue_entry = CharacterEditQueue.objects.get(
+                    new_character=character)
                 queue_entry.approved = None
                 queue_entry.save()
 
@@ -113,12 +113,13 @@ class Characters(ViewSet):
             character.alias = request.data['alias']
             character.age = request.data['age']
             character.bio = request.data['bio']
-            character.reader = Reader.objects.get(pk = request.data['reader_id'])
+            character.image = request.FILES.get('image')
+            character.reader = Reader.objects.get(pk=request.data['reader_id'])
 
             character.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
-        else: 
+        else:
             return Response({"message": "Only staff may update characters directly"}, status=status.HTTP_401_UNAUTHORIZED)
 
     def destroy(self, request, pk=None):
@@ -136,11 +137,10 @@ class Characters(ViewSet):
 
             except Exception as ex:
                 return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
         else:
             return Response({"message": "Only staff may delete characters directly"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    
     @action(methods=['post'], detail=True)
     def create_relationships(self, request, pk=None):
 
@@ -148,7 +148,6 @@ class Characters(ViewSet):
             character = Character.objects.get(pk=pk)
             authors = request.data['authors']
             fictions = request.data['fictions']
-
 
             if 'series' in request.data.keys():
                 for author in authors:
@@ -164,9 +163,9 @@ class Characters(ViewSet):
                         author_work.save()
 
                 if 'characters' in request.data.keys() or 'series' in request.data.keys():
-                            pass
-                else: return Response({}, status=status.HTTP_201_CREATED) 
-
+                    pass
+                else:
+                    return Response({}, status=status.HTTP_201_CREATED)
 
             if set(('series', 'characters')).issubset(request.data):
                 series = Series.objects.get(pk=request.data['series']['id'])
@@ -174,7 +173,8 @@ class Characters(ViewSet):
                 for character in characters:
                     char = Character.objects.get(pk=character['id'])
                     try:
-                        char_fiction = CharacterFictionAssociation.objects.get(character=char, fiction=fiction, series=series)
+                        char_fiction = CharacterFictionAssociation.objects.get(
+                            character=char, fiction=fiction, series=series)
                         return Response({'request': "association already created"}, status=status.HTTP_406_NOT_ACCEPTABLE)
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
@@ -202,7 +202,8 @@ class Characters(ViewSet):
                 for character in request.data['characters']:
                     char = Character.objects.get(pk=character['id'])
                     try:
-                        char_fiction = CharacterFictionAssociation.objects.get(character=char, fiction=fiction)
+                        char_fiction = CharacterFictionAssociation.objects.get(
+                            character=char, fiction=fiction)
 
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
@@ -217,21 +218,23 @@ class Characters(ViewSet):
 
         if request.method == 'POST':
             base_character = Character.objects.get(pk=pk)
-            reader = Reader.objects.get(user = request.auth.user)
-            
+            reader = Reader.objects.get(user=request.auth.user)
+
             new_character = Character()
 
-            new_character.reader = Reader.objects.get(user=request.auth.user)
-            new_character.name = request.data['name']
-            new_character.born_on = request.data['born_on']
-            new_character.died_on = request.data['died_on']
-            new_character.alias = request.data['alias']
-            new_character.age = request.data['age']
-            new_character.bio = request.data['bio']
+            new_character.name = request.POST.get('name')
+            new_character.image = request.FILES.get('image')
+            new_character.reader = reader
+            new_character.born_on = request.POST.get('born_on')
+            new_character.died_on = request.POST.get('died_on')
+            new_character.alias = request.POST.get('alias')
+            new_character.age = request.POST.get('age')
+            new_character.bio = request.POST.get('bio')
             new_character.public_version = False
 
             try:
-                check_queue = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
+                check_queue = CharacterEditQueue.objects.get(
+                    base_character=base_character, reader=reader)
                 return Response({"request": "You already have an entry in the edit queue for this character"}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
             except CharacterEditQueue.DoesNotExist:
@@ -253,27 +256,31 @@ class Characters(ViewSet):
     def check_for_match(self, request, pk=None):
 
         if request.method == 'GET':
-            reader = Reader.objects.get(user = request.auth.user)
+            reader = Reader.objects.get(user=request.auth.user)
             new_character = Character.objects.get(pk=pk)
 
-            try :
-                edit_queue_entry = CharacterEditQueue.objects.get(new_character=new_character, reader=reader)
+            try:
+                edit_queue_entry = CharacterEditQueue.objects.get(
+                    new_character=new_character, reader=reader)
                 base_version = edit_queue_entry.base_character
 
-                base_version.associations = CharacterAssociation.objects.filter(char_one=base_version)
+                base_version.associations = CharacterAssociation.objects.filter(
+                    char_one=base_version)
                 if base_version.associations.count() > 0:
-                    serializer = FirstCharacterSerializer(base_version, context={'request': request})
+                    serializer = FirstCharacterSerializer(
+                        base_version, context={'request': request})
                 else:
-                    base_version.associations = CharacterAssociation.objects.filter(char_two=base_version)
+                    base_version.associations = CharacterAssociation.objects.filter(
+                        char_two=base_version)
                     if base_version.associations.count() > 0:
-                        serializer = SecondCharacterSerializer(base_version, context={'request': request})
+                        serializer = SecondCharacterSerializer(
+                            base_version, context={'request': request})
 
                 if base_version.associations.count() == 0:
-                    serializer = FirstCharacterSerializer(base_version, context={'request': request})    
+                    serializer = FirstCharacterSerializer(
+                        base_version, context={'request': request})
 
                 return Response(serializer.data)
-            
-
 
             except CharacterEditQueue.DoesNotExist:
                 return Response({"response": "No match currently in edit queue"}, status=status.HTTP_204_NO_CONTENT)
@@ -284,46 +291,50 @@ class Characters(ViewSet):
     def check_for_match_original(self, request, pk=None):
 
         if request.method == 'GET':
-            reader = Reader.objects.get(user = request.auth.user)
+            reader = Reader.objects.get(user=request.auth.user)
             base_character = Character.objects.get(pk=pk)
 
-            try :
-                edit_queue_entry = CharacterEditQueue.objects.get(base_character=base_character, reader=reader)
+            try:
+                edit_queue_entry = CharacterEditQueue.objects.get(
+                    base_character=base_character, reader=reader)
                 new_character = edit_queue_entry.new_character
 
-                new_character.associations = CharacterAssociation.objects.filter(char_one=new_character)
+                new_character.associations = CharacterAssociation.objects.filter(
+                    char_one=new_character)
                 if new_character.associations.count() > 0:
-                    serializer = FirstCharacterSerializer(new_character, context={'request': request})
+                    serializer = FirstCharacterSerializer(
+                        new_character, context={'request': request})
                 else:
-                    new_character.associations = CharacterAssociation.objects.filter(char_two=new_character)
+                    new_character.associations = CharacterAssociation.objects.filter(
+                        char_two=new_character)
                     if new_character.associations.count() > 0:
-                        serializer = SecondCharacterSerializer(new_character, context={'request': request})
+                        serializer = SecondCharacterSerializer(
+                            new_character, context={'request': request})
 
                 if new_character.associations.count() == 0:
-                    serializer = FirstCharacterSerializer(new_character, context={'request': request})    
+                    serializer = FirstCharacterSerializer(
+                        new_character, context={'request': request})
 
                 return Response(serializer.data)
-            
-
 
             except CharacterEditQueue.DoesNotExist:
                 return Response({}, status=status.HTTP_204_NO_CONTENT)
             except Exception as ex:
                 return HttpResponseServerError(ex)
 
-
     @action(methods=['put', 'delete'], detail=True)
     def decide_edit(self, request, pk=None):
-        reader = Reader.objects.get(user = request.auth.user)
+        reader = Reader.objects.get(user=request.auth.user)
         base_character = Character.objects.get(pk=pk)
-        new_character = Character.objects.get(pk = request.data['id'])
+        new_character = Character.objects.get(pk=request.data['id'])
 
         if reader.user.is_staff is False:
             return Response({"warning": "Only admins may perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
         if request.method == 'PUT':
 
             try:
-                queue_entry = CharacterEditQueue.objects.get(base_character=base_character, new_character=new_character)
+                queue_entry = CharacterEditQueue.objects.get(
+                    base_character=base_character, new_character=new_character)
                 base_character.name = new_character.name
                 base_character.alias = new_character.alias
                 base_character.born_on = new_character.born_on
@@ -337,14 +348,10 @@ class Characters(ViewSet):
             except Exception as ex:
                 return HttpResponseServerError(ex)
 
-
-
-
-
-
         elif request.method == 'DELETE':
             try:
-                queue = CharacterEditQueue.objects.get(base_character=base_character, new_character=new_character, reader=reader)
+                queue = CharacterEditQueue.objects.get(
+                    base_character=base_character, new_character=new_character, reader=reader)
                 queue.approved = False
                 queue.save()
 
@@ -355,33 +362,38 @@ class Characters(ViewSet):
 
     @action(methods=['get'], detail=False)
     def unapproved(self, request):
-        unapproved_characters = Character.objects.filter(public_version = False).exclude(new_char__approved=False)
+        unapproved_characters = Character.objects.filter(public_version=False).exclude(new_char__approved=False)
 
-        
         name = self.request.query_params.get('name', None)
         fiction = self.request.query_params.get('fiction', None)
         author = self.request.query_params.get('author', None)
         series = self.request.query_params.get('series', None)
 
         if name is not None:
-            unapproved_characters = unapproved_characters.filter(name__icontains=name)
-        
+            unapproved_characters = unapproved_characters.filter(
+                name__icontains=name)
+
         if fiction is not None:
-            unapproved_characters = unapproved_characters.filter(fiction_char__fiction=int(fiction))
+            unapproved_characters = unapproved_characters.filter(
+                fiction_char__fiction=int(fiction))
 
         if series is not None:
-            unapproved_characters = unapproved_characters.filter(fiction_char__series=int(series))
+            unapproved_characters = unapproved_characters.filter(
+                fiction_char__series=int(series))
 
         if author is not None:
-            unapproved_characters = unapproved_characters.filter(fiction_char__fiction__author_fiction__author__id=int(author))
+            unapproved_characters = unapproved_characters.filter(
+                fiction_char__fiction__author_fiction__author__id=int(author))
 
-        serializer = GenericCharacterSerializer(unapproved_characters, many=True, context={'request': request})
+        serializer = GenericCharacterSerializer(
+            unapproved_characters, many=True, context={'request': request})
         return Response(serializer.data)
 
     @action(methods=['delete'], detail=True)
     def destroy_all_personal_versions(self, request, pk=None):
         if request.auth.user.is_staff:
-            personal_versions = Character.objects.filter(new_char__base_character__id=pk)
+            personal_versions = Character.objects.filter(
+                new_char__base_character__id=pk)
             for character in personal_versions:
                 character.delete()
 
@@ -390,26 +402,30 @@ class Characters(ViewSet):
             return Response({"Warning": "Only admins may access this function"}, status=status.HTTP_403_FORBIDDEN)
 
 
-
 class AssociatedCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
         fields = ('name', 'age', 'born_on', 'died_on', 'alias', 'bio',)
 
+
 class FirstAssociationSerializer(serializers.ModelSerializer):
 
     char_two = AssociatedCharacterSerializer(many=False)
+
     class Meta:
         model = CharacterAssociation
         fields = ('char_two', 'description',)
 
+
 class SecondAssociationSerializer(serializers.ModelSerializer):
 
     char_one = AssociatedCharacterSerializer(many=False)
+
     class Meta:
         model = CharacterAssociation
         fields = ('char_one', 'description',)
+
 
 class FirstCharacterSerializer(serializers.ModelSerializer):
 
@@ -421,7 +437,9 @@ class FirstCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations', 'image')
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio',
+                  'public_version', 'works', 'series', 'creators', 'associations', 'image')
+
 
 class SecondCharacterSerializer(serializers.ModelSerializer):
 
@@ -433,7 +451,8 @@ class SecondCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version','works', 'series', 'creators', 'associations', 'image')
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio',
+                  'public_version', 'works', 'series', 'creators', 'associations', 'image')
 
 
 class GenericCharacterSerializer(serializers.ModelSerializer):
@@ -441,8 +460,8 @@ class GenericCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', 'works', 'series', 'creators', 'image', 'edit')
-        
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias',
+                  'bio', 'public_version', 'works', 'series', 'creators', 'image', )
 
 
 class ListCharacterSerializer(serializers.ModelSerializer):
@@ -453,4 +472,5 @@ class ListCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ('id', 'name', 'alias', 'public_version', 'works', 'series', 'creators')
+        fields = ('id', 'name', 'alias', 'public_version',
+                  'works', 'series', 'creators')
