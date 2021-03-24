@@ -37,7 +37,9 @@ class Authors(ModelViewSet):
         author.name = request.data['name']
         author.reader = Reader.objects.get(user=request.auth.user)
         author.born_on = request.data['born_on']
-        author.died_on = request.data['died_on']
+
+        if author.died_on and author.died_on is not "":
+            author.died_on = request.data['died_on']
         author.bio = request.data['bio']
         
         try:
