@@ -1,4 +1,3 @@
-from character_finder_api.views import character
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from django.http import HttpResponseServerError

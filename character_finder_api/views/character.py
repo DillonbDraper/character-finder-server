@@ -1,3 +1,4 @@
+from character_finder_api.views import fiction
 from character_finder_api.models.character_association import CharacterAssociation
 from character_finder_api.serializers import BasicSeriesSerializer, BasicAuthorSerializer, BasicFictionSerializer
 from django.core.exceptions import ValidationError
@@ -6,7 +7,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
-from character_finder_api.models import Character, Reader, CharacterFictionAssociation, Author, AuthorFictionAssociation, Series, CharacterEditQueue
+from character_finder_api.models import Character, Reader, CharacterFictionAssociation, Author, AuthorFictionAssociation, Series, CharacterEditQueue, Fiction
 from rest_framework.decorators import action
 
 
@@ -146,72 +147,54 @@ class Characters(ViewSet):
 
         if request.method == "POST":
             character = Character.objects.get(pk=pk)
-            authors = request.data['authors']
-            fictions = request.data['fictions']
 
-            if 'series' in request.data.keys():
-                for author in authors:
-                    author = Author.objects.get(pk=author['id'])
-                    try:
-                        author_work = AuthorFictionAssociation.objects.get(
-                            author=author, fiction=fiction)
-
-                    except AuthorFictionAssociation.DoesNotExist:
-                        author_work = AuthorFictionAssociation()
-                        author_work.fiction = fiction
-                        author_work.author = author
-                        author_work.save()
-
-                if 'characters' in request.data.keys() or 'series' in request.data.keys():
-                    pass
-                else:
-                    return Response({}, status=status.HTTP_201_CREATED)
-
-            if set(('series', 'characters')).issubset(request.data):
+            if set(('series', 'fictions')).issubset(request.data):
                 series = Series.objects.get(pk=request.data['series']['id'])
-                characters = request.data['characters']
-                for character in characters:
-                    char = Character.objects.get(pk=character['id'])
+                fictions = request.data['fictions']
+                for fiction in fictions:
+                    current_fiction = Fiction.objects.get(pk=fiction['id'])
                     try:
                         char_fiction = CharacterFictionAssociation.objects.get(
-                            character=char, fiction=fiction, series=series)
+                            character=character, fiction=current_fiction, series=series)
                         return Response({'request': "association already created"}, status=status.HTTP_406_NOT_ACCEPTABLE)
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
-                        char_fiction.character = char
-                        char_fiction.fiction = fiction
+                        char_fiction.character = character
+                        char_fiction.fiction = current_fiction
                         char_fiction.series = series
                         char_fiction.save()
 
                 return Response({}, status=status.HTTP_201_CREATED)
 
-            elif 'series' in request.data.keys():
-                series = Series.objects.get(pk=request.data['series']['id'])
-                try:
-                    char_fiction = CharacterFictionAssociation.objects.get(
-                        series=series, fiction=fiction)
-                except CharacterFictionAssociation.DoesNotExist:
-                    char_fiction = CharacterFictionAssociation()
-                    char_fiction.fiction = fiction
-                    char_fiction.series = series
-                    char_fiction.save()
-
-                    return Response({}, status=status.HTTP_201_CREATED)
-
-            elif 'characters' in request.data.keys():
-                for character in request.data['characters']:
-                    char = Character.objects.get(pk=character['id'])
+            elif 'fictions' in request.data.keys():
+                fictions = request.data['fictions']
+                for fiction in fictions: 
+                    current_fiction = Fiction.objects.get(pk=fiction['id'])
                     try:
                         char_fiction = CharacterFictionAssociation.objects.get(
-                            character=char, fiction=fiction)
-
+                            character=character, fiction=fiction)
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
-                        char_fiction.character = char
                         char_fiction.fiction = fiction
                         char_fiction.save()
 
-                return Response({}, status=status.HTTP_201_CREATED)
+                        return Response({}, status=status.HTTP_201_CREATED)
+
+            elif 'series' in request.data.keys:
+                    series = Series.objects.get(['series']['id'])
+
+                    try:
+                        character_series_relationship = CharacterFictionAssociation.objects.get(character=character, series=series)
+
+                    except CharacterFictionAssociation.DoesNotExist:
+                        character_series = CharacterFictionAssociation()
+                        character_series.character = character
+                        character_series.series = series
+                        character_series.save()
+
+
+                    return Response({}, status=status.HTTP_201_CREATED)
+
 
     @action(methods=['post'], detail=True)
     def edit_request(self, request, pk=None):
