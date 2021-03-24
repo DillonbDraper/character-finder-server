@@ -16,16 +16,18 @@ class Characters(ViewSet):
     def create(self, request):
         character = Character()
 
-        character.name = request.data['name']
+        character.name = request.POST.get('name')
+        character.image = request.FILES.get('image')
         character.reader = Reader.objects.get(user=request.auth.user)
-        character.born_on = request.data['born_on']
-        character.died_on = request.data['died_on']
-        character.alias = request.data['alias']
-        character.age = request.data['age']
-        character.bio = request.data['bio']
-        character.image = request.data['image']
+        character.born_on = request.POST.get('born_on')
+        character.died_on = request.POST.get('died_on')
+        character.alias = request.POST.get('alias')
+        character.age = request.POST.get('age')
+        character.bio = request.POST.get('bio')
+
+
         
-        if request.data['edit'] is True:
+        if request.POST.get('edit') == True:
             character.public_version = False
         else:
             character.public_version = True
@@ -439,7 +441,7 @@ class GenericCharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         depth = 1
-        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', 'works', 'series', 'creators', 'image')
+        fields = ('id', 'reader', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio', 'public_version', 'works', 'series', 'creators', 'image', 'edit')
         
 
 
