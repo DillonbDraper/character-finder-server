@@ -340,6 +340,7 @@ class Characters(ViewSet):
                 base_character.born_on = new_character.born_on
                 base_character.died_on = new_character.died_on
                 base_character.bio = new_character.bio
+                base_character.image = new_character.image
 
                 base_character.save()
                 new_character.delete()
