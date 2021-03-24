@@ -172,16 +172,17 @@ class Characters(ViewSet):
                     current_fiction = Fiction.objects.get(pk=fiction['id'])
                     try:
                         char_fiction = CharacterFictionAssociation.objects.get(
-                            character=character, fiction=fiction)
+                            character=character, fiction=current_fiction)
                     except CharacterFictionAssociation.DoesNotExist:
                         char_fiction = CharacterFictionAssociation()
-                        char_fiction.fiction = fiction
+                        char_fiction.character = character
+                        char_fiction.fiction = current_fiction
                         char_fiction.save()
 
                         return Response({}, status=status.HTTP_201_CREATED)
 
-            elif 'series' in request.data.keys:
-                    series = Series.objects.get(['series']['id'])
+            elif 'series' in request.data.keys():
+                    series = Series.objects.get(pk=request.data['series']['id'])
 
                     try:
                         character_series_relationship = CharacterFictionAssociation.objects.get(character=character, series=series)
