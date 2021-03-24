@@ -82,14 +82,14 @@ class Characters(ViewSet):
             characters = characters.filter(name__icontains=name)
 
         if fiction is not None:
-            characters = characters.filter(fiction_char__fiction=int(fiction))
+            characters = characters.filter(fiction_char__fiction=int(fiction)).distinct()
 
         if series is not None:
-            characters = characters.filter(fiction_char__series=int(series))
+            characters = characters.filter(fiction_char__series=int(series)).distinct()
 
         if author is not None:
             characters = characters.filter(
-                fiction_char__fiction__author_fiction__author__id=int(author))
+                fiction_char__fiction__author_fiction__author__id=int(author)).distinct()
 
         serializer = ListCharacterSerializer(
             characters, many=True, context={'request': request})
