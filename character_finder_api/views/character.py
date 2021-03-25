@@ -7,6 +7,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
+from django.db.models import Q
 from character_finder_api.models import Character, Reader, CharacterFictionAssociation, Author, AuthorFictionAssociation, Series, CharacterEditQueue, Fiction
 from rest_framework.decorators import action
 
@@ -110,6 +111,10 @@ class Characters(ViewSet):
                 for relationship in relationships_to_wipe:
                     relationship.delete()
 
+                intercharacter_relationships_to_wipe = CharacterAssociation.objects.filter(Q(char_one=character) | Q(char_two=character))
+                for relationship in intercharacter_relationships_to_wipe:
+                    relationship.delete()
+
                 queue_entry = CharacterEditQueue.objects.get(
                     new_character=character)
                 queue_entry.approved = None
@@ -153,6 +158,13 @@ class Characters(ViewSet):
 
         if request.method == "POST":
             character = Character.objects.get(pk=pk)
+
+            if 'characters' in request.data.keys():
+                new_associate = Character.objects.get(pk=request.data['characters']['id'])
+
+                new_association = CharacterAssociation(char_one=character, char_two=new_associate)
+                new_association.description = request.data['description']
+                new_association.save()
 
             if set(('series', 'fictions')).issubset(request.data):
                 series = Series.objects.get(pk=request.data['series']['id'])
@@ -201,6 +213,7 @@ class Characters(ViewSet):
                     character_series.save()
 
                 return Response({}, status=status.HTTP_201_CREATED)
+
 
     @action(methods=['post'], detail=True)
     def edit_request(self, request, pk=None):
