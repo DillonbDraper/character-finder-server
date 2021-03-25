@@ -151,8 +151,8 @@ class Characters(ViewSet):
             if set(('series', 'fictions')).issubset(request.data):
                 series = Series.objects.get(pk=request.data['series']['id'])
                 fictions = request.data['fictions']
-                for fiction in fictions:
-                    current_fiction = Fiction.objects.get(pk=fiction['id'])
+                for fic in fictions:
+                    current_fiction = Fiction.objects.get(pk=fic['id'])
                     try:
                         char_fiction = CharacterFictionAssociation.objects.get(
                             character=character, fiction=current_fiction, series=series)
