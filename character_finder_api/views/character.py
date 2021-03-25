@@ -106,6 +106,10 @@ class Characters(ViewSet):
 
             if request.data['reset_queue']:
 
+                relationships_to_wipe = CharacterFictionAssociation.objects.filter(character=character)
+                for relationship in relationships_to_wipe:
+                    relationship.delete()
+
                 queue_entry = CharacterEditQueue.objects.get(
                     new_character=character)
                 queue_entry.approved = None
