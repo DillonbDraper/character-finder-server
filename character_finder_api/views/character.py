@@ -83,10 +83,12 @@ class Characters(ViewSet):
             characters = characters.filter(name__icontains=name)
 
         if fiction is not None:
-            characters = characters.filter(fiction_char__fiction=int(fiction)).distinct()
+            characters = characters.filter(
+                fiction_char__fiction=int(fiction)).distinct()
 
         if series is not None:
-            characters = characters.filter(fiction_char__series=int(series)).distinct()
+            characters = characters.filter(
+                fiction_char__series=int(series)).distinct()
 
         if author is not None:
             characters = characters.filter(
@@ -168,7 +170,7 @@ class Characters(ViewSet):
 
             elif 'fictions' in request.data.keys():
                 fictions = request.data['fictions']
-                for fiction in fictions: 
+                for fiction in fictions:
                     current_fiction = Fiction.objects.get(pk=fiction['id'])
                     try:
                         char_fiction = CharacterFictionAssociation.objects.get(
@@ -182,20 +184,19 @@ class Characters(ViewSet):
                         return Response({}, status=status.HTTP_201_CREATED)
 
             elif 'series' in request.data.keys():
-                    series = Series.objects.get(pk=request.data['series']['id'])
+                series = Series.objects.get(pk=request.data['series']['id'])
 
-                    try:
-                        character_series_relationship = CharacterFictionAssociation.objects.get(character=character, series=series)
+                try:
+                    character_series_relationship = CharacterFictionAssociation.objects.get(
+                        character=character, series=series)
 
-                    except CharacterFictionAssociation.DoesNotExist:
-                        character_series = CharacterFictionAssociation()
-                        character_series.character = character
-                        character_series.series = series
-                        character_series.save()
+                except CharacterFictionAssociation.DoesNotExist:
+                    character_series = CharacterFictionAssociation()
+                    character_series.character = character
+                    character_series.series = series
+                    character_series.save()
 
-
-                    return Response({}, status=status.HTTP_201_CREATED)
-
+                return Response({}, status=status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=True)
     def edit_request(self, request, pk=None):
@@ -231,10 +232,12 @@ class Characters(ViewSet):
                 queue_entry.new_character = new_character
                 if queue_entry.approved is not None:
                     queue_entry.approved = None
-
                 queue_entry.save()
 
-                return Response({}, status=status.HTTP_201_CREATED)
+                serializer = GenericCharacterSerializer(
+                    new_character, context={'request': request})
+                return Response(serializer.data)
+
 
     @action(methods=['get'], detail=True)
     def check_for_match(self, request, pk=None):
@@ -347,10 +350,11 @@ class Characters(ViewSet):
 
     @action(methods=['get'], detail=False)
     def unapproved(self, request):
-        unapproved_characters = Character.objects.filter(public_version=False).exclude(new_char__approved=False)
+        unapproved_characters = Character.objects.filter(
+            public_version=False).exclude(new_char__approved=False)
 
         name = self.request.query_params.get('name', None)
-        fiction = self.request.query_params.get('fiction', None)
+        fic = self.request.query_params.get('fiction', None)
         author = self.request.query_params.get('author', None)
         series = self.request.query_params.get('series', None)
 
@@ -358,9 +362,9 @@ class Characters(ViewSet):
             unapproved_characters = unapproved_characters.filter(
                 name__icontains=name)
 
-        if fiction is not None:
+        if fic is not None:
             unapproved_characters = unapproved_characters.filter(
-                fiction_char__fiction=int(fiction))
+                fiction_char__fiction=int(fic))
 
         if series is not None:
             unapproved_characters = unapproved_characters.filter(
@@ -370,7 +374,7 @@ class Characters(ViewSet):
             unapproved_characters = unapproved_characters.filter(
                 fiction_char__fiction__author_fiction__author__id=int(author))
 
-        serializer = GenericCharacterSerializer(
+        serializer = ListCharacterSerializer(
             unapproved_characters, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -441,6 +445,7 @@ class SecondCharacterSerializer(serializers.ModelSerializer):
 
 
 class GenericCharacterSerializer(serializers.ModelSerializer):
+    works = BasicFictionSerializer(many=True)
 
     class Meta:
         model = Character
@@ -457,5 +462,6 @@ class ListCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
+        depth = 1
         fields = ('id', 'name', 'alias', 'public_version',
-                  'works', 'series', 'creators')
+                  'works', 'series', 'creators', 'reader')
