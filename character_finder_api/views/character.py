@@ -107,11 +107,13 @@ class Characters(ViewSet):
 
             if request.data['reset_queue']:
 
-                relationships_to_wipe = CharacterFictionAssociation.objects.filter(character=character)
+                relationships_to_wipe = CharacterFictionAssociation.objects.filter(
+                    character=character)
                 for relationship in relationships_to_wipe:
                     relationship.delete()
 
-                intercharacter_relationships_to_wipe = CharacterAssociation.objects.filter(Q(char_one=character) | Q(char_two=character))
+                intercharacter_relationships_to_wipe = CharacterAssociation.objects.filter(
+                    Q(char_one=character) | Q(char_two=character))
                 for relationship in intercharacter_relationships_to_wipe:
                     relationship.delete()
 
@@ -160,9 +162,11 @@ class Characters(ViewSet):
             character = Character.objects.get(pk=pk)
 
             if 'characters' in request.data.keys():
-                new_associate = Character.objects.get(pk=request.data['characters']['id'])
+                new_associate = Character.objects.get(
+                    pk=request.data['characters']['id'])
 
-                new_association = CharacterAssociation(char_one=character, char_two=new_associate)
+                new_association = CharacterAssociation(
+                    char_one=character, char_two=new_associate)
                 new_association.description = request.data['description']
                 new_association.save()
 
@@ -214,7 +218,6 @@ class Characters(ViewSet):
 
                 return Response({}, status=status.HTTP_201_CREATED)
 
-
     @action(methods=['post'], detail=True)
     def edit_request(self, request, pk=None):
 
@@ -254,7 +257,6 @@ class Characters(ViewSet):
                 serializer = GenericCharacterSerializer(
                     new_character, context={'request': request})
                 return Response(serializer.data)
-
 
     @action(methods=['get'], detail=True)
     def check_for_match(self, request, pk=None):
@@ -346,6 +348,14 @@ class Characters(ViewSet):
                 base_character.bio = new_character.bio
                 base_character.image = new_character.image
 
+                base_character_associations = CharacterFictionAssociation.objects.filter(character=base_character)
+                for association in base_character_associations:
+                    association.delete()
+
+                base_character_associations_with_chars = CharacterAssociation.objects.filter(char_one=base_character)
+                for association in base_character_associations_with_chars:
+                    association.delete()
+
                 base_character.save()
                 new_character.delete()
 
@@ -356,7 +366,7 @@ class Characters(ViewSet):
         elif request.method == 'DELETE':
             try:
                 queue = CharacterEditQueue.objects.get(
-                    base_character=base_character, new_character=new_character)
+                    base_character=base_character, new_character=new_character, reader=reader)
                 queue.approved = False
                 queue.save()
 
@@ -412,7 +422,7 @@ class AssociatedCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ('name', 'age', 'born_on', 'died_on', 'alias', 'bio',)
+        fields = ('id', 'name', 'age', 'born_on', 'died_on', 'alias', 'bio',)
 
 
 class FirstAssociationSerializer(serializers.ModelSerializer):
