@@ -44,7 +44,7 @@ def register_user(request):
         username=req_body['username'],
         email=req_body['email'],
         password=req_body['password'],
-        is_staff=1
+        is_staff=0
     )
 
     reader = Reader.objects.create(
@@ -59,6 +59,6 @@ def register_user(request):
 
     reader.save()
     # Return the token to the client
-    data = json.dumps({"valid": True, "token": token.key, "staff" : staff})
+    data = json.dumps({"valid": True, "token": token.key})
 
     return HttpResponse(data, content_type='application/json')

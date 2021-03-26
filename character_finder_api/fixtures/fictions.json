@@ -31,5 +31,27 @@
             "description": "Sequel to fellowship",
             "genre": 1
         }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 4,
+        "fields": {
+            "reader": 1,
+            "title": "The Way Of Kings",
+            "date_published": "1985-11-11",
+            "description": "Beginning novel in the Stormlight Archives.  A powerful work",
+            "genre": 1
+        }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 5,
+        "fields": {
+            "reader": 1,
+            "title": "Foundation",
+            "date_published": "1985-11-11",
+            "description": "A heady novel about the developed of the fictional science of psychohistory, which can predict the future of large societies",
+            "genre": 3
+        }
     }
 ]

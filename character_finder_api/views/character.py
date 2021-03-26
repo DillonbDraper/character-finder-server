@@ -260,8 +260,8 @@ class Characters(ViewSet):
     def check_for_match(self, request, pk=None):
 
         if request.method == 'GET':
-            reader = Reader.objects.get(user=request.auth.user)
             new_character = Character.objects.get(pk=pk)
+            reader = new_character.reader
 
             try:
                 edit_queue_entry = CharacterEditQueue.objects.get(
@@ -356,7 +356,7 @@ class Characters(ViewSet):
         elif request.method == 'DELETE':
             try:
                 queue = CharacterEditQueue.objects.get(
-                    base_character=base_character, new_character=new_character, reader=reader)
+                    base_character=base_character, new_character=new_character)
                 queue.approved = False
                 queue.save()
 

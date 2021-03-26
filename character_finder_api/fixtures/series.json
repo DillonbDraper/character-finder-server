@@ -16,5 +16,32 @@
             "description": "Popularized epic fantasy and is still incredibly popular",
             "genre": 1
         }
+    },
+    {
+        "model": "character_finder_api.Series",
+        "pk": 3,
+        "fields": {
+            "title": "Harry Potter",
+            "description": "Children's fantasy series that spawned a multi-billion dollar media empire",
+            "genre": 1
+        }
+    },
+    {
+        "model": "character_finder_api.Series",
+        "pk": 4,
+        "fields": {
+            "title": "The Stormlight Archives",
+            "description": "Modern fantasy series that explores both magical lands and the reality of mental illness in its characters",
+            "genre": 1
+        }
+    },
+    {
+        "model": "character_finder_api.Series",
+        "pk": 5,
+        "fields": {
+            "title": "Foundation Trilology",
+            "description": "Asimov's series of so-called science novels changed the sci-fi genre forever",
+            "genre": 3
+        }
     }
 ]
