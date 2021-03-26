@@ -37,8 +37,8 @@
         "pk": 4,
         "fields": {
             "reader": 1,
-            "name": "American author of epic fantasy and science fiction. He is best known for the Cosmere fictional universe, in which most of his fantasy novels, most notably the Mistborn series and The Stormlight Archive, are set. He is also known for finishing Robert Jordan's high fantasy series The Wheel of Time.",
-            "bio": "",
+            "name": "Brandon Sanderson",
+            "bio": "American author of epic fantasy and science fiction. He is best known for the Cosmere fictional universe, in which most of his fantasy novels, most notably the Mistborn series and The Stormlight Archive, are set. He is also known for finishing Robert Jordan's high fantasy series The Wheel of Time.",
             "born_on": "1892-01-03",
             "died_on": "1973-09-02"
         }
