@@ -6,6 +6,5 @@ from .characters import Character
 from .fiction_characters import CharacterFictionAssociation
 from .fictions import Fiction
 from .genres import Genre
-from .media_type import MediaType
 from .readers import Reader
 from .series import Series

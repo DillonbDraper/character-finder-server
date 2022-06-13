@@ -7,7 +7,6 @@
             "title": "The Fellowship of the Ring",
             "date_published": "1954-07-29",
             "description": "This is a placeholder description for a long book",
-            "media_type": 1,
             "genre": 1
         }
     },
@@ -19,8 +18,40 @@
             "title": "Absalom, Absalom!",
             "date_published": "1936-01-01",
             "description": "This is a placeholder description for a long book",
-            "media_type": 1,
             "genre": 5
+        }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 3,
+        "fields": {
+            "reader": 1,
+            "title": "The Two Towers",
+            "date_published": "1954-11-11",
+            "description": "Sequel to fellowship",
+            "genre": 1
+        }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 4,
+        "fields": {
+            "reader": 1,
+            "title": "The Way Of Kings",
+            "date_published": "1985-11-11",
+            "description": "Beginning novel in the Stormlight Archives.  A powerful work",
+            "genre": 1
+        }
+    },
+    {
+        "model": "character_finder_api.Fiction",
+        "pk": 5,
+        "fields": {
+            "reader": 1,
+            "title": "Foundation",
+            "date_published": "1985-11-11",
+            "description": "A heady novel about the developed of the fictional science of psychohistory, which can predict the future of large societies",
+            "genre": 3
         }
     }
 ]

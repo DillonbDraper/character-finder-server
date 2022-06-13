@@ -14,5 +14,13 @@
             "author": 1,
             "fiction": 2
         }
+    },
+    {
+        "model": "character_finder_api.AuthorFictionAssociation",
+        "pk": 3,
+        "fields": {
+            "author": 2,
+            "fiction": 3
+        }
     }
 ]
